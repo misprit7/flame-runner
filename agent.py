@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 from controls.pad import Button, Pad, Stick, Trigger
 import cv2, pathlib, os, time
 
@@ -16,7 +18,7 @@ while True:
     # last_frame_num = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)-1
     if not ret:
         print('read failed!')
-        continue
+        break
 
     cv2.imshow('image',image)
     # cv2.waitKey(0)
