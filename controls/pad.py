@@ -37,7 +37,7 @@ class Pad:
     """
     def __init__(self, path):
         """Create, but do not open the fifo."""
-        self.path = path
+        self.path = os.path.expanduser(path)
         open(self.path, 'a').close()
 
     def __enter__(self):

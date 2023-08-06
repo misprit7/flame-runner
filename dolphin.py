@@ -3,7 +3,7 @@
 from controls.pad import Button, Pad, Stick, Trigger
 import cv2, pathlib, os, time, argparse, subprocess, atexit
 
-from ray.rllib.env.policy_client import PolicyClient
+# from ray.rllib.env.policy_client import PolicyClient
 
 ###############################################################################
 # Constants
@@ -35,7 +35,7 @@ parser.add_argument(
     "--port", type=int, default=9900, help="The port to use (on localhost)."
 )
 parser.add_argument(
-    "--gui", type=bool, default=False, help="Whether to show ui of in game video"
+    "--gui", action=argparse.BooleanOptionalAction, help="Whether to show ui of in game video"
 )
 
 args = parser.parse_args()
@@ -79,10 +79,13 @@ vidcap = cv2.VideoCapture(dump_url)
 # Execute main training
 ###############################################################################
 
-with Pad(dolphin_path + '/Pipes/pipe1') as pad:
+with Pad(dolphin_path + 'Pipes/pipe1') as pad:
     rewards = 0.0
     frame = 0
     last_time = time.time()
+    pad.press_button(Button.A)
+    time.sleep(0.02)
+    pad.release_button(Button.A)
     while True:
         frame += 1
         ret, image = vidcap.read()
