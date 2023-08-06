@@ -1,9 +1,9 @@
-#! /usr/bin/python3
+#!/usr/bin/env python
 
 from controls.pad import Button, Pad, Stick, Trigger
 import cv2, pathlib, os, time
 
-dump_url = pathlib.Path('rtsp://localhost:8554/mystream')
+dump_url = pathlib.Path('rtsp://localhost:8554/dolphin')
 
 # while len(os.listdir(dump_dir)) == 0: time.sleep(0.001)
 

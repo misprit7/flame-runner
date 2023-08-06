@@ -323,7 +323,7 @@ paths:
     # Redirect path parameters (when source is "redirect")
 
     # RTSP URL which clients will be redirected to.
-    sourceRedirect: mystream
+    sourceRedirect: dolphin
 
     ###############################################
     # Raspberry Pi Camera path parameters (when source is "rpiCamera")
