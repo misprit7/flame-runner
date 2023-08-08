@@ -2,6 +2,7 @@
 #include "DolphinProcess/DolphinAccessor.h"
 #include <stdio.h>
 
+
 int main(void){
     DolphinComm::DolphinAccessor::hook();
 

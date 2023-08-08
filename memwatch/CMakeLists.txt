@@ -11,5 +11,5 @@ set(CMAKE_INCLUE_CURRENT_DIR ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 # add_executable(memwatch ${SRCS} main.cpp)
-add_library(memwatch SHARED ${SRCS})
+add_library(memwatch SHARED ${SRCS} memwatch.cpp)
 
