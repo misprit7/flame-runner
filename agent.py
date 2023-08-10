@@ -1,30 +1,55 @@
 #!/usr/bin/env python
 
-from controls.pad import Button, Pad, Stick, Trigger
-import cv2, pathlib, os, time
+import ray
+from ray import air, tune
+from ray.rllib.env.policy_server_input import PolicyServerInput
+from ray.rllib.examples.custom_metrics_and_callbacks import MyCallbacks
+from ray.tune.logger import pretty_print
+from ray.tune.registry import get_trainable_cls
 
-dump_url = pathlib.Path('rtsp://localhost:8554/dolphin')
+###############################################################################
+# Init
+###############################################################################
 
-# while len(os.listdir(dump_dir)) == 0: time.sleep(0.001)
+ray.init()
 
-time.sleep(0.5)
+config = (
+    get_trainable_cls('PPO').get_default_config()
+    # Indicate that the Algorithm we setup here doesn't need an actual env.
+    # Allow spaces to be determined by user (see below).
+    .environment(
+        env=None,
+        observation_space=[],
+        action_space=[],
+    )
+    # DL framework to use.
+    .framework('tf2')
+    # Create a "chatty" client/server or not.
+    .callbacks(None)
+    # Use the `PolicyServerInput` to generate experiences.
+    # .offline_data(input_=_input)
+    # Use n worker processes to listen on different ports.
+    .rollouts(
+        num_rollout_workers=1,
+        # Connectors are not compatible with the external env.
+        enable_connectors=False,
+    )
+    # Disable OPE, since the rollouts are coming from online clients.
+    .evaluation(off_policy_estimation_methods={})
+    # Set to INFO so we'll see the server's actual address:port.
+    .debugging(log_level="INFO")
+)
 
-vidcap = cv2.VideoCapture(str(dump_url))
-# last_frame_num = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)-1
-# vidcap.set(cv2.CAP_PROP_POS_FRAMES, last_frame_num-10)
+config.rl_module(_enable_rl_module_api=False)
+config.training(_enable_learner_api=False)
 
-while True:
-    ret, image = vidcap.read()
-    # last_frame_num = vidcap.get(cv2.CAP_PROP_FRAME_COUNT)-1
-    if not ret:
-        print('read failed!')
-        break
+config.update_from_dict(
+    {
+        "rollout_fragment_length": 1000,
+        "train_batch_size": 4000,
+        # "model": {"use_lstm": false},
+    }
+)
 
-    cv2.imshow('image',image)
-    # cv2.waitKey(0)
-    # time.sleep(1/60)
-    time.sleep(0.001)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
-    # time.sleep(0.0001)
+algo = config.build()
 

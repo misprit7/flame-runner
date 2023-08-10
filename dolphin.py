@@ -55,20 +55,36 @@ processes = []
 # Ask politely to terminate, might not work if process is hanging
 atexit.register(lambda: [x.terminate() for x in processes])
 
-dolphin_cmd = f'dolphin-emu-nogui --platform={"x11" if args.gui else "headless"} --exec="{game_file}" --save_state="{save_file}" --user={dolphin_user_path}'
+dolphin_cmd = f'dolphin-emu-nogui --platform={"x11" if args.gui else "headless"}' \
+    '--exec="{game_file}" --save_state="{save_file}" --user={dolphin_user_path}'
 mediamtx_cmd = 'mediamtx ./rtsp-config.yml'
 
 print(f'Starting mediamtx server: {mediamtx_cmd}')
-rtsp_process = subprocess.Popen(mediamtx_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+rtsp_process = subprocess.Popen(
+    mediamtx_cmd,
+    shell=True,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+)
 processes.append(rtsp_process)
 time.sleep(0.3)
 assert rtsp_process.poll() is None
 
 print(f'Starting dolphin: {dolphin_cmd}')
-dolphin_process = subprocess.Popen(dolphin_cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+dolphin_process = subprocess.Popen(
+    dolphin_cmd,
+    shell=True,
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+    text=True
+)
 processes.append(dolphin_process)
+
+from ray.rllib.env.policy_client import PolicyClient
+
 time.sleep(3)
-assert rtsp_process.poll() is None
+assert dolphin_process.poll() is None
 
 client = PolicyClient(
     f"http://localhost:{args.port}", inference_mode=args.inference_mode
